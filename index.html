@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>Demo</title>
+<title>OpenPifPafWebDemo</title>
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,7 +18,7 @@
 <body>
 <header>
 <h2 id="d-title"><a href="/" class="text-muted">
-<img id="d-logo" alt="logo" src="_static/logo.svg" />Demo
+<img id="d-logo" alt="logo" src="_static/logo.svg" />OpenPifPafWebDemo
 </a></h2>
 </header>
 <main>
@@ -28,30 +28,23 @@
 <div id="databench-alerts"></div>
 
 <div>
-<div>
 <video id="video" style="width:50px; position:absolute;" controls autoplay muted playsinline></video>
 <canvas id="canvas-capture" style="display: none" width=640 height=480></canvas>
 <canvas id="canvas-out" width=320 height=240></canvas>
 </div>
-<br />
-<label for="resolution">Resolution:</label>
-<input type="range" id="resolution" value="10" min="10" max="200" step="5" />
-</div>
+
 <div style="font-size: 200%">
 FPS = <em><span id="fps">0</span></em>
 </div>
+<br />
 
 
-
-
-</main>
 <footer>
-Created with <a href="http://databench.trivial.io">Databench</a>.
-<!-- This is Databench v0.7.1 and analyses v0.0.0.debug-7672. -->
+<a href="https://www.epfl.ch/about/overview/overview/regulations-and-guidelines/">EPFL Legal</a>
 </footer>
 
-<script src="//webrtc.github.io/adapter/adapter-latest.js" type="text/javascript"></script>
-<script src="_static/databench.js?v=0.7.1"></script>
+</main>
+
 <script src="analysis.js?v=0.0.0.debug-7672"></script>
 
 </body>
