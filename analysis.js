@@ -108,7 +108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* global document */
 Object.defineProperty(exports, "__esModule", { value: true });
 var backend_location = (document.location.search && document.location.search[0] == '?') ? document.location.search.substr(1) : '';
-if (!backend_location && document.location.hostname == 'github') {
+if (!backend_location && document.location.hostname == 'vita-epfl.github.io') {
     backend_location = 'https://vitapc11.epfl.ch';
 }
 var video = document.getElementById('video');
