@@ -105,17 +105,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 "use strict";
 
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -124,38 +113,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var defaultCapabilities = { audio: false, video: { width: 640, height: 480 } };
-var Camera = /** @class */ (function () {
-    function Camera(ui) {
-        var _this = this;
+const defaultCapabilities = { audio: false, video: { width: 640, height: 480 } };
+class Camera {
+    constructor(ui) {
         this.ui = ui;
         this.video = ui.getElementsByTagName('video')[0];
         this.captureCanvas = ui.getElementsByTagName('canvas')[0];
@@ -164,14 +125,14 @@ var Camera = /** @class */ (function () {
         this.captureContext = this.captureCanvas.getContext('2d');
         this.buttonNextCamera = ui.getElementsByClassName('nextCamera')[0];
         this.captureCounter = 0;
-        navigator.mediaDevices.enumerateDevices().then(function (devices) {
-            _this.cameraIds = devices
-                .filter(function (device) { return device.kind === 'videoinput'; })
-                .map(function (device) { return device.deviceId; });
+        navigator.mediaDevices.enumerateDevices().then(devices => {
+            this.cameraIds = devices
+                .filter(device => device.kind === 'videoinput')
+                .map(device => device.deviceId);
             // On iOS, all deviceId and label for devices are empty.
             // So making up labels here that should be used for facingMode instead.
-            if (_this.cameraIds.length >= 2 && _this.cameraIds.every(function (i) { return i === ''; })) {
-                _this.cameraIds = ['user', 'environment'];
+            if (this.cameraIds.length >= 2 && this.cameraIds.every(i => i === '')) {
+                this.cameraIds = ['user', 'environment'];
             }
         }).catch(function (err) {
             console.log(err.name + ': ' + err.message);
@@ -179,35 +140,26 @@ var Camera = /** @class */ (function () {
         this.setCamera();
         this.buttonNextCamera.onclick = this.nextCamera.bind(this);
     }
-    Camera.prototype.setCamera = function (cameraId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var capabilities, stream;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (cameraId && cameraId === this.cameraId)
-                            return [2 /*return*/];
-                        capabilities = __assign({}, defaultCapabilities, { video: __assign({}, defaultCapabilities.video) });
-                        if (cameraId === 'user' || cameraId === 'environment') {
-                            capabilities.video.facingMode = cameraId;
-                        }
-                        else {
-                            capabilities.video.deviceId = cameraId;
-                        }
-                        return [4 /*yield*/, navigator.mediaDevices.getUserMedia(capabilities)];
-                    case 1:
-                        stream = _a.sent();
-                        this.video.srcObject = stream;
-                        this.cameraId = cameraId;
-                        return [2 /*return*/];
-                }
-            });
+    setCamera(cameraId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (cameraId && cameraId === this.cameraId)
+                return;
+            let capabilities = Object.assign({}, defaultCapabilities, { video: Object.assign({}, defaultCapabilities.video) });
+            if (cameraId === 'user' || cameraId === 'environment') {
+                capabilities.video.facingMode = cameraId;
+            }
+            else {
+                capabilities.video.deviceId = cameraId;
+            }
+            const stream = yield navigator.mediaDevices.getUserMedia(capabilities);
+            this.video.srcObject = stream;
+            this.cameraId = cameraId;
         });
-    };
-    Camera.prototype.imageData = function () {
+    }
+    imageData() {
         // update capture canvas size
-        var landscape = this.video.clientWidth > this.video.clientHeight;
-        var targetSize = landscape ? this.originalCaptureCanvasSize : this.originalCaptureCanvasSize.slice().reverse();
+        const landscape = this.video.clientWidth > this.video.clientHeight;
+        const targetSize = landscape ? this.originalCaptureCanvasSize : this.originalCaptureCanvasSize.slice().reverse();
         if (this.captureCanvas.width !== targetSize[0])
             this.captureCanvas.width = targetSize[0];
         if (this.captureCanvas.height !== targetSize[1])
@@ -216,12 +168,12 @@ var Camera = /** @class */ (function () {
         this.captureCounter += 1;
         this.captureContext.drawImage(this.video, 0, 0, this.captureCanvas.width, this.captureCanvas.height);
         return { image_id: this.captureCounter, image: this.captureCanvas.toDataURL() };
-    };
-    Camera.prototype.nextCamera = function () {
-        var nextCameraId = undefined;
+    }
+    nextCamera() {
+        let nextCameraId = undefined;
         if (this.cameraId && this.cameraIds.length > 1) {
-            var currentCameraIndex = this.cameraIds.indexOf(this.cameraId);
-            var nextCameraIndex = currentCameraIndex + 1;
+            const currentCameraIndex = this.cameraIds.indexOf(this.cameraId);
+            let nextCameraIndex = currentCameraIndex + 1;
             if (nextCameraIndex >= this.cameraIds.length)
                 nextCameraIndex = 0;
             nextCameraId = this.cameraIds[nextCameraIndex];
@@ -234,9 +186,8 @@ var Camera = /** @class */ (function () {
             nextCameraId = this.cameraIds[0];
         }
         this.setCamera(nextCameraId);
-    };
-    return Camera;
-}());
+    }
+}
 exports.Camera = Camera;
 
 
@@ -260,136 +211,41 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var camera_1 = __webpack_require__(/*! ./camera */ "./js/src/camera.ts");
-var visualization_1 = __webpack_require__(/*! ./visualization */ "./js/src/visualization.ts");
-var onnx = __webpack_require__(/*! onnxjs */ "./node_modules/onnxjs/dist/onnx.min.js");
-var ndarray = __webpack_require__(/*! ndarray */ "./node_modules/ndarray/ndarray.js");
-var ops = __webpack_require__(/*! ndarray-ops */ "./node_modules/ndarray-ops/ndarray-ops.js");
-var backend_location = '';
+const camera_1 = __webpack_require__(/*! ./camera */ "./js/src/camera.ts");
+const visualization_1 = __webpack_require__(/*! ./visualization */ "./js/src/visualization.ts");
+const onnx = __webpack_require__(/*! onnxjs */ "./node_modules/onnxjs/dist/onnx.min.js");
+const ndarray = __webpack_require__(/*! ndarray */ "./node_modules/ndarray/ndarray.js");
+const ops = __webpack_require__(/*! ndarray-ops */ "./node_modules/ndarray-ops/ndarray-ops.js");
+let backend_location = '';
 if (document.location.search && document.location.search[0] === '?') {
     backend_location = document.location.search.substr(1);
 }
 if (!backend_location && document.location.hostname === 'vita-epfl.github.io') {
     backend_location = 'https://vitademo.epfl.ch';
 }
-var fpsSpan = document.getElementById('fps');
-var captureCounter = 0;
-var fps = 0.0;
-var lastProcessing = null;
-var c = new camera_1.Camera(document.getElementById('capture'));
-var vis = new visualization_1.Visualization(document.getElementById('visualization'));
+const fpsSpan = document.getElementById('fps');
+let captureCounter = 0;
+let fps = 0.0;
+let lastProcessing = null;
+const c = new camera_1.Camera(document.getElementById('capture'));
+const vis = new visualization_1.Visualization(document.getElementById('visualization'));
 vis.markerSize = 10;
 function drawFields(image, modelOutput) {
-    var pifC = modelOutput.get('pif_c');
-    var pifR = modelOutput.get('pif_r');
-    var pafC = modelOutput.get('paf_c');
-    var pafR1 = modelOutput.get('paf_r1');
-    var pafR2 = modelOutput.get('paf_r2');
-    console.log({ pifC: pifC });
-    // adjust height of output canvas
-    var landscape = pifC.dims[3] > pifC.dims[2];
-    var targetSize = landscape ? vis.originalCanvasSize : vis.originalCanvasSize.slice().reverse();
-    if (vis.canvas.width !== targetSize[0])
-        vis.canvas.width = targetSize[0];
-    if (vis.canvas.height !== targetSize[1])
-        vis.canvas.height = targetSize[1];
-    var connectionColors = [
-        '#1f77b4',
-        '#aec7e8',
-        '#ff7f0e',
-        '#ffbb78',
-        '#2ca02c',
-        '#98df8a',
-        '#d62728',
-        '#ff9896',
-        '#9467bd',
-        '#c5b0d5',
-        '#8c564b',
-        '#c49c94',
-        '#e377c2',
-        '#f7b6d2',
-        '#7f7f7f',
-        '#c7c7c7',
-        '#bcbd22',
-        '#dbdb8d',
-        '#17becf',
-        '#9edae5',
-    ];
-    // draw on output canvas
-    var canvasImage = new Image();
-    canvasImage.onload = function () {
-        vis.context.drawImage(canvasImage, 0, 0, vis.canvas.width, vis.canvas.height);
-        for (var ii = 0; ii < pafC.dims[2]; ++ii) {
-            for (var jj = 0; jj < pafC.dims[3]; ++jj) {
-                for (var kk = 0; kk < pafC.dims[1]; ++kk) {
-                    var v = pafC.get(0, kk, ii, jj);
-                    if (v < 0.8)
-                        continue;
-                    var fx1 = jj + pafR1.get(0, kk, 0, ii, jj);
-                    var fy1 = ii + pafR1.get(0, kk, 1, ii, jj);
-                    var fx2 = jj + pafR2.get(0, kk, 0, ii, jj);
-                    var fy2 = ii + pafR2.get(0, kk, 1, ii, jj);
-                    vis.context.beginPath();
-                    vis.context.lineWidth = vis.lineWidth;
-                    vis.context.strokeStyle = connectionColors[kk];
-                    vis.context.moveTo(fx1 * vis.canvas.width / (pifC.dims[3] - 1), fy1 * vis.canvas.height / (pifC.dims[2] - 1));
-                    vis.context.lineTo(fx2 * vis.canvas.width / (pifC.dims[3] - 1), fy2 * vis.canvas.height / (pifC.dims[2] - 1));
-                    vis.context.stroke();
-                }
-            }
-        }
-        for (var ii = 0; ii < pifC.dims[2]; ++ii) {
-            for (var jj = 0; jj < pifC.dims[3]; ++jj) {
-                for (var ll = 0; ll < pifC.dims[1]; ++ll) {
-                    var v = pifC.get(0, ll, ii, jj);
-                    if (v < 0.8)
-                        continue;
-                    vis.context.beginPath();
-                    vis.context.fillStyle = '#fff';
-                    var fx = jj + pifR.get(0, ll, 0, ii, jj);
-                    var fy = ii + pifR.get(0, ll, 1, ii, jj);
-                    vis.context.arc(fx * vis.canvas.width / (pifC.dims[3] - 1), fy * vis.canvas.height / (pifC.dims[2] - 1), (v - 0.8) / 0.2 * vis.markerSize, 0, 2 * Math.PI);
-                    vis.context.fill();
-                }
-            }
-        }
-    };
-    canvasImage.src = image;
+    const pifC = modelOutput.get('pif_c');
+    const pifR = modelOutput.get('pif_r');
+    const pafC = modelOutput.get('paf_c');
+    const pafR1 = modelOutput.get('paf_r1');
+    const pafR2 = modelOutput.get('paf_r2');
+    console.log({ pifC });
+    vis.drawFields(image, pifC, pifR, pafC, pafR1, pafR2, 0.8);
 }
 function preProcess(ctx) {
-    var imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-    var data = imageData.data, width = imageData.width, height = imageData.height;
-    var dataTensor = ndarray(data, [height, width, 4]);
+    const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+    const { data, width, height } = imageData;
+    const dataTensor = ndarray(data, [height, width, 4]);
     // const dataTensor = ndtranspose(dataTensorT);
-    var dataProcessedTensor = ndarray(new Float32Array(width * height * 3), [1, 3, height, width]);
+    const dataProcessedTensor = ndarray(new Float32Array(width * height * 3), [1, 3, height, width]);
     ops.assign(dataProcessedTensor.pick(0, 0, null, null), dataTensor.pick(null, null, 0));
     ops.assign(dataProcessedTensor.pick(0, 1, null, null), dataTensor.pick(null, null, 1));
     ops.assign(dataProcessedTensor.pick(0, 2, null, null), dataTensor.pick(null, null, 2));
@@ -400,70 +256,63 @@ function preProcess(ctx) {
     ops.divseq(dataProcessedTensor.pick(0, 0, null, null), 0.229);
     ops.divseq(dataProcessedTensor.pick(0, 1, null, null), 0.224);
     ops.divseq(dataProcessedTensor.pick(0, 2, null, null), 0.225);
-    var tensor = new onnx.Tensor(new Float32Array(3 * height * width), 'float32', [1, 3, height, width]);
+    const tensor = new onnx.Tensor(new Float32Array(3 * height * width), 'float32', [1, 3, height, width]);
     tensor.data.set(dataProcessedTensor.data);
-    console.log({ width: width, height: height });
+    console.log({ width, height });
     return tensor;
 }
-var model_loaded = false;
-// create a session
-var session = new onnx.InferenceSession({ backendHint: 'webgl' });
-// load the ONNX model file
-session.loadModel('static/openpifpaf-resnet50.onnx').then(function () { model_loaded = true; });
-// session.loadModel('static/openpifpaf-shufflenetv2x2.onnx').then(() => { model_loaded = true; });
+// load the ONNX model
+let session = null;
+let modelLoaded = null;
+const modelSelectorDiv = document.getElementById('model-selector');
+function loadModel(modelData) {
+    modelLoaded = null;
+    session = new onnx.InferenceSession({ backendHint: 'webgl' });
+    session.loadModel(modelData.url).then(() => { modelLoaded = modelData; });
+}
+// wire up model selection ui
+const inputElements = modelSelectorDiv.getElementsByTagName('input');
+for (let radioElement of inputElements) {
+    radioElement.onchange = (ev) => {
+        console.log(radioElement.dataset);
+        loadModel({ name: radioElement.dataset.name, url: radioElement.dataset.url });
+    };
+}
+inputElements[0].checked = true;
+inputElements[0].onchange(null);
 function newImageOnnx() {
-    return __awaiter(this, void 0, void 0, function () {
-        var data, inferenceInputs, startSession, output, duration;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (!!model_loaded) return [3 /*break*/, 2];
-                    console.log('model not loaded yet');
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(function () { return resolve(); }, 200); })];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/];
-                case 2:
-                    data = c.imageData();
-                    inferenceInputs = preProcess(c.captureContext);
-                    // execute the model
-                    console.log('about to run new session');
-                    startSession = Date.now();
-                    return [4 /*yield*/, session.run([inferenceInputs])];
-                case 3:
-                    output = _a.sent();
-                    console.log({ 'nn done': Date.now() - startSession });
-                    if (lastProcessing != null) {
-                        duration = Date.now() - lastProcessing;
-                        console.log({ duration: duration });
-                        fps = 0.5 * fps + 0.5 * (1000.0 / duration);
-                        fpsSpan.textContent = "" + fps.toFixed(1);
-                    }
-                    lastProcessing = Date.now();
-                    // process output
-                    drawFields(data.image, output);
-                    return [2 /*return*/];
-            }
-        });
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!modelLoaded) {
+            console.log('model not loaded yet');
+            yield new Promise(resolve => setTimeout(() => resolve(), 200));
+            return;
+        }
+        // generate model input
+        const data = c.imageData();
+        const inferenceInputs = preProcess(c.captureContext);
+        // execute the model
+        console.log('about to run new session');
+        const startSession = Date.now();
+        const output = yield session.run([inferenceInputs]);
+        console.log({ 'nn done': Date.now() - startSession });
+        if (lastProcessing != null) {
+            const duration = Date.now() - lastProcessing;
+            console.log({ duration });
+            fps = 0.5 * fps + 0.5 * (1000.0 / duration);
+            fpsSpan.textContent = `${fps.toFixed(1)}`;
+        }
+        lastProcessing = Date.now();
+        // process output
+        drawFields(data.image, output);
     });
 }
 exports.newImageOnnx = newImageOnnx;
 function loop_forever() {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (false) {}
-                    return [4 /*yield*/, newImageOnnx()];
-                case 1:
-                    _a.sent();
-                    return [4 /*yield*/, new Promise(function (resolve) { return requestAnimationFrame(function () { return resolve(); }); })];
-                case 2:
-                    _a.sent();
-                    return [3 /*break*/, 0];
-                case 3: return [2 /*return*/];
-            }
-        });
+    return __awaiter(this, void 0, void 0, function* () {
+        while (true) {
+            yield newImageOnnx();
+            yield new Promise(resolve => requestAnimationFrame(() => resolve()));
+        }
     });
 }
 loop_forever();
@@ -481,12 +330,12 @@ loop_forever();
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var COCO_PERSON_SKELETON = [
+const COCO_PERSON_SKELETON = [
     [16, 14], [14, 12], [17, 15], [15, 13], [12, 13], [6, 12], [7, 13],
     [6, 7], [6, 8], [7, 9], [8, 10], [9, 11], [2, 3], [1, 2], [1, 3],
     [2, 4], [3, 5], [4, 6], [5, 7]
 ];
-var COLORS = [
+const COLORS = [
     '#1f77b4',
     '#aec7e8',
     '#ff7f0e',
@@ -508,65 +357,112 @@ var COLORS = [
     '#17becf',
     '#9edae5',
 ];
-var Visualization = /** @class */ (function () {
-    function Visualization(ui) {
+class Visualization {
+    constructor(ui) {
         this.canvas = ui.getElementsByTagName('canvas')[0];
         this.originalCanvasSize = [this.canvas.width, this.canvas.height];
         this.context = this.canvas.getContext('2d');
         this.lineWidth = 10;
         this.markerSize = 4;
     }
-    Visualization.prototype.draw = function (image, data) {
-        var _this = this;
-        var scores = data.map(function (entry) { return entry.score; });
+    draw(image, data) {
+        const scores = data.map((entry) => entry.score);
         // adjust height of output canvas
         if (data && data.length > 0) {
-            var landscape = data[0].width_height[0] > data[0].width_height[1];
-            var targetSize = landscape ? this.originalCanvasSize : this.originalCanvasSize.slice().reverse();
+            const landscape = data[0].width_height[0] > data[0].width_height[1];
+            const targetSize = landscape ? this.originalCanvasSize : this.originalCanvasSize.slice().reverse();
             if (this.canvas.width !== targetSize[0])
                 this.canvas.width = targetSize[0];
             if (this.canvas.height !== targetSize[1])
                 this.canvas.height = targetSize[1];
         }
         // draw on output canvas
-        var i = new Image();
-        i.onload = function () {
-            _this.context.drawImage(i, 0, 0, _this.canvas.width, _this.canvas.height);
-            data.forEach(function (entry) { return _this.drawSkeleton(entry.coordinates, entry.detection_id); });
+        const canvasImage = new Image();
+        canvasImage.onload = () => {
+            this.context.drawImage(canvasImage, 0, 0, this.canvas.width, this.canvas.height);
+            data.forEach((entry) => this.drawSkeleton(entry.coordinates, entry.detection_id));
         };
-        i.src = image;
-    };
-    Visualization.prototype.drawSkeletonLines = function (keypoints) {
-        var _this = this;
-        COCO_PERSON_SKELETON.forEach(function (joint_pair, connection_index) {
-            var joint1i = joint_pair[0], joint2i = joint_pair[1];
-            var joint1xyv = keypoints[joint1i - 1];
-            var joint2xyv = keypoints[joint2i - 1];
-            var color = COLORS[connection_index % COLORS.length];
-            _this.context.strokeStyle = color;
-            _this.context.lineWidth = _this.lineWidth;
+        canvasImage.src = image;
+    }
+    drawSkeletonLines(keypoints) {
+        COCO_PERSON_SKELETON.forEach((joint_pair, connection_index) => {
+            const [joint1i, joint2i] = joint_pair;
+            const joint1xyv = keypoints[joint1i - 1];
+            const joint2xyv = keypoints[joint2i - 1];
+            const color = COLORS[connection_index % COLORS.length];
+            this.context.strokeStyle = color;
+            this.context.lineWidth = this.lineWidth;
             if (joint1xyv[2] === 0.0 || joint2xyv[2] === 0.0)
                 return;
-            _this.context.beginPath();
-            _this.context.moveTo(joint1xyv[0] * _this.canvas.width, joint1xyv[1] * _this.canvas.height);
-            _this.context.lineTo(joint2xyv[0] * _this.canvas.width, joint2xyv[1] * _this.canvas.height);
-            _this.context.stroke();
+            this.context.beginPath();
+            this.context.moveTo(joint1xyv[0] * this.canvas.width, joint1xyv[1] * this.canvas.height);
+            this.context.lineTo(joint2xyv[0] * this.canvas.width, joint2xyv[1] * this.canvas.height);
+            this.context.stroke();
         });
-    };
-    Visualization.prototype.drawSkeleton = function (keypoints, detection_id) {
-        var _this = this;
+    }
+    drawSkeleton(keypoints, detection_id) {
         this.drawSkeletonLines(keypoints);
-        keypoints.forEach(function (xyv, joint_id) {
+        keypoints.forEach((xyv, joint_id) => {
             if (xyv[2] === 0.0)
                 return;
-            _this.context.beginPath();
-            _this.context.fillStyle = '#ffffff';
-            _this.context.arc(xyv[0] * _this.canvas.width, xyv[1] * _this.canvas.height, _this.markerSize, 0, 2 * Math.PI);
-            _this.context.fill();
+            this.context.beginPath();
+            this.context.fillStyle = '#ffffff';
+            this.context.arc(xyv[0] * this.canvas.width, xyv[1] * this.canvas.height, this.markerSize, 0, 2 * Math.PI);
+            this.context.fill();
         });
-    };
-    return Visualization;
-}());
+    }
+    drawFields(image, pifC, pifR, pafC, pafR1, pafR2, threshold) {
+        // adjust height of output canvas
+        const landscape = pifC.dims[3] > pifC.dims[2];
+        const targetSize = landscape ? this.originalCanvasSize : this.originalCanvasSize.slice().reverse();
+        if (this.canvas.width !== targetSize[0])
+            this.canvas.width = targetSize[0];
+        if (this.canvas.height !== targetSize[1])
+            this.canvas.height = targetSize[1];
+        // draw on output canvas
+        const canvasImage = new Image();
+        canvasImage.onload = () => {
+            this.context.drawImage(canvasImage, 0, 0, this.canvas.width, this.canvas.height);
+            const xScale = this.canvas.width / (pifC.dims[3] - 1);
+            const yScale = this.canvas.height / (pifC.dims[2] - 1);
+            for (let ii = 0; ii < pafC.dims[2]; ++ii) {
+                for (let jj = 0; jj < pafC.dims[3]; ++jj) {
+                    for (let kk = 0; kk < pafC.dims[1]; ++kk) {
+                        const v = pafC.get(0, kk, ii, jj);
+                        if (v < threshold)
+                            continue;
+                        const fx1 = jj + pafR1.get(0, kk, 0, ii, jj);
+                        const fy1 = ii + pafR1.get(0, kk, 1, ii, jj);
+                        const fx2 = jj + pafR2.get(0, kk, 0, ii, jj);
+                        const fy2 = ii + pafR2.get(0, kk, 1, ii, jj);
+                        this.context.beginPath();
+                        this.context.lineWidth = this.lineWidth;
+                        this.context.strokeStyle = COLORS[kk];
+                        this.context.moveTo(fx1 * xScale, fy1 * yScale);
+                        this.context.lineTo(fx2 * xScale, fy2 * yScale);
+                        this.context.stroke();
+                    }
+                }
+            }
+            for (let ii = 0; ii < pifC.dims[2]; ++ii) {
+                for (let jj = 0; jj < pifC.dims[3]; ++jj) {
+                    for (let ll = 0; ll < pifC.dims[1]; ++ll) {
+                        const v = pifC.get(0, ll, ii, jj);
+                        if (v < threshold)
+                            continue;
+                        this.context.beginPath();
+                        this.context.fillStyle = '#fff';
+                        const fx = jj + pifR.get(0, ll, 0, ii, jj);
+                        const fy = ii + pifR.get(0, ll, 1, ii, jj);
+                        this.context.arc(fx * xScale, fy * yScale, (v - threshold) / threshold * this.markerSize, 0, 2 * Math.PI);
+                        this.context.fill();
+                    }
+                }
+            }
+        };
+        canvasImage.src = image;
+    }
+}
 exports.Visualization = Visualization;
 
 
