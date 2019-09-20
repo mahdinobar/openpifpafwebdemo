@@ -259,6 +259,9 @@ function preProcess(ctx) {
     const tensor = new onnx.Tensor(new Float32Array(3 * height * width), 'float32', [1, 3, height, width]);
     tensor.data.set(dataProcessedTensor.data);
     console.log({ width, height });
+    if (height > width) {
+        alert('use landscape mode and reload the page');
+    }
     return tensor;
 }
 // load the ONNX model
@@ -293,7 +296,15 @@ function newImageOnnx() {
         // execute the model
         console.log('about to run new session');
         const startSession = Date.now();
-        const output = yield session.run([inferenceInputs]);
+        let output = null;
+        try {
+            output = yield session.run([inferenceInputs]);
+        }
+        catch (err) {
+            console.error(err.message);
+            alert(err.message);
+            return;
+        }
         console.log({ 'nn done': Date.now() - startSession });
         if (lastProcessing != null) {
             const duration = Date.now() - lastProcessing;
