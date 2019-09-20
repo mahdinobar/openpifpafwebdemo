@@ -149,7 +149,14 @@ class Camera {
             this.captureCanvas.height = targetSize[1];
         // capture
         this.captureCounter += 1;
+        // draw
+        this.captureContext.save();
+        if (this.facingMode == 'user') {
+            this.captureContext.translate(this.captureCanvas.width, 0);
+            this.captureContext.scale(-1, 1);
+        }
         this.captureContext.drawImage(this.video, 0, 0, this.captureCanvas.width, this.captureCanvas.height);
+        this.captureContext.restore();
         return { image_id: this.captureCounter, image: this.captureCanvas.toDataURL() };
     }
     nextCamera() {

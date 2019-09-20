@@ -57,6 +57,15 @@ pre, code {
     font-family: Menlo, "Courier New", monospace;
 }
 
+#capture {
+    position: fixed;
+    top: 70px;
+}
+
+#capture video {
+    width: 50px;
+}
+
 button {
     display: inline-block;
     cursor: pointer;
