@@ -126,6 +126,7 @@ class Camera {
         this.buttonNextCamera = ui.getElementsByClassName('nextCamera')[0];
         this.captureCounter = 0;
         navigator.mediaDevices.enumerateDevices().then(devices => {
+            console.log(devices);
             this.cameraIds = devices
                 .filter(device => device.kind === 'videoinput')
                 .map(device => device.deviceId);
@@ -259,9 +260,6 @@ function preProcess(ctx) {
     const tensor = new onnx.Tensor(new Float32Array(3 * height * width), 'float32', [1, 3, height, width]);
     tensor.data.set(dataProcessedTensor.data);
     console.log({ width, height });
-    if (height > width) {
-        alert('use landscape mode and reload the page');
-    }
     return tensor;
 }
 // load the ONNX model
@@ -293,6 +291,11 @@ function newImageOnnx() {
         // generate model input
         const data = c.imageData();
         const inferenceInputs = preProcess(c.captureContext);
+        const [n_batch, n_colors, height, width] = inferenceInputs.dims;
+        if (height > width) {
+            alert('use landscape mode');
+            return;
+        }
         // execute the model
         console.log('about to run new session');
         const startSession = Date.now();
