@@ -57,10 +57,6 @@ pre, code {
     font-family: Menlo, "Courier New", monospace;
 }
 
-#capture {
-    display: inline;
-}
-
 button {
     display: inline-block;
     cursor: pointer;

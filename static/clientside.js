@@ -129,14 +129,6 @@ class Camera {
         this.setCamera('user');
         this.buttonNextCamera.onclick = this.nextCamera.bind(this);
     }
-    checkStickyVideo() {
-        if (window.pageYOffset >= this.video.offsetTop) {
-            this.video.classList.add("sticky");
-        }
-        else {
-            this.video.classList.remove("sticky");
-        }
-    }
     setCamera(facingMode) {
         return __awaiter(this, void 0, void 0, function* () {
             if (facingMode === this.facingMode)
