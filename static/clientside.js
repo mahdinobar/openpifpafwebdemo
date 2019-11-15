@@ -301,6 +301,7 @@ function loop_forever() {
         while (true) {
             yield newImageOnnx();
             yield new Promise(resolve => requestAnimationFrame(() => resolve()));
+            yield new Promise(resolve => setTimeout(() => resolve(), 5));
         }
     });
 }
