@@ -220,7 +220,7 @@ function newImage() {
         lastProcessing = Date.now();
         const body = yield response.json();
         console.log(body);
-        vis.draw(data.image, body);
+        yield vis.draw(data.image, body);
     });
 }
 exports.newImage = newImage;
@@ -295,11 +295,14 @@ class Visualization {
         }
         // draw on output canvas
         const canvasImage = new Image();
-        canvasImage.onload = () => {
-            this.context.drawImage(canvasImage, 0, 0, this.canvas.width, this.canvas.height);
-            data.forEach((entry) => this.drawSkeleton(entry.coordinates, entry.detection_id));
-        };
-        canvasImage.src = image;
+        return new Promise((resolve, reject) => {
+            canvasImage.onload = () => {
+                this.context.drawImage(canvasImage, 0, 0, this.canvas.width, this.canvas.height);
+                data.forEach((entry) => this.drawSkeleton(entry.coordinates, entry.detection_id));
+                resolve();
+            };
+            canvasImage.src = image;
+        });
     }
     drawSkeletonLines(keypoints) {
         COCO_PERSON_SKELETON.forEach((joint_pair, connection_index) => {
