@@ -420,12 +420,14 @@ class Visualization {
                 this.context.drawImage(canvasImage, 0, 0, this.canvas.width, this.canvas.height);
                 const xScale = this.canvas.width / (pifC.dims[3] - 1);
                 const yScale = this.canvas.height / (pifC.dims[2] - 1);
+                let pafCounter = 0;
                 for (let ii = 0; ii < pafC.dims[2]; ++ii) {
                     for (let jj = 0; jj < pafC.dims[3]; ++jj) {
                         for (let kk = 0; kk < pafC.dims[1]; ++kk) {
                             const v = pafC.get(0, kk, ii, jj);
                             if (v < threshold)
                                 continue;
+                            pafCounter += 1;
                             const fx1 = jj + pafR1.get(0, kk, 0, ii, jj);
                             const fy1 = ii + pafR1.get(0, kk, 1, ii, jj);
                             const fx2 = jj + pafR2.get(0, kk, 0, ii, jj);
@@ -439,12 +441,14 @@ class Visualization {
                         }
                     }
                 }
+                let pifCounter = 0;
                 for (let ii = 0; ii < pifC.dims[2]; ++ii) {
                     for (let jj = 0; jj < pifC.dims[3]; ++jj) {
                         for (let ll = 0; ll < pifC.dims[1]; ++ll) {
                             const v = pifC.get(0, ll, ii, jj);
                             if (v < threshold)
                                 continue;
+                            pifCounter += 1;
                             this.context.beginPath();
                             this.context.fillStyle = '#fff';
                             const fx = jj + pifR.get(0, ll, 0, ii, jj);
@@ -454,6 +458,7 @@ class Visualization {
                         }
                     }
                 }
+                console.log({ pifCounter, pafCounter });
                 resolve();
             };
             canvasImage.onerror = () => reject();
