@@ -151,7 +151,7 @@ class Camera {
         this.captureCounter += 1;
         // draw
         this.captureContext.save();
-        if (this.facingMode == 'user') {
+        if (this.facingMode === 'user') {
             this.captureContext.translate(this.captureCanvas.width, 0);
             this.captureContext.scale(-1, 1);
         }
