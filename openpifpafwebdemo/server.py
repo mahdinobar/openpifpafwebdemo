@@ -60,7 +60,11 @@ class PostHandler(RequestHandler):
         print('keypoint_sets_2=',keypoint_sets_2)
 
         # concatenate PifPaf and handPifPaf
-        if keypoint_sets.__len__()>0 and keypoint_sets_2.__len__()>0:
+        if keypoint_sets.__len__()>0:
+            if keypoint_sets_2.__len__()==0:
+                keypoint_sets_2.append(np.zeros((21,3)))
+                scores_2.append(np.float64(0.))
+                width_height_2 = width_height
             # assumption: only ONE hand prediction
             for ins in range (0, keypoint_sets.__len__()):
                 keypoint_sets[ins] = np.concatenate((keypoint_sets[ins], keypoint_sets_2[0]))
