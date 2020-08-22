@@ -21,11 +21,14 @@ import openpifpaf
 from .processor import Processor
 from . import __version__ as VERSION
 
+import numpy as np
+
 
 # pylint: disable=abstract-method
 class PostHandler(RequestHandler):
-    def initialize(self, processor, *, demo_password):
+    def initialize(self, processor, processor_2, *, demo_password):
         self.processor = processor  # pylint: disable=attribute-defined-outside-init
+        self.processor_2 = processor_2
         self.demo_password = demo_password  # pylint: disable=attribute-defined-outside-init
 
     def set_default_headers(self):
@@ -50,6 +53,23 @@ class PostHandler(RequestHandler):
                 return
             resize = False
         keypoint_sets, scores, width_height = self.processor.single_image(image, resize=resize)
+        print('keypoint_sets=',keypoint_sets)
+
+        # handPifPaf
+        keypoint_sets_2, scores_2, width_height_2 = self.processor_2.single_image(image, resize=resize)
+        print('keypoint_sets_2=',keypoint_sets_2)
+
+        # concatenate PifPaf and handPifPaf
+        if keypoint_sets.__len__()>0 and keypoint_sets_2.__len__()>0:
+            # assumption: only ONE hand prediction
+            for ins in range (0, keypoint_sets.__len__()):
+                keypoint_sets[ins] = np.concatenate((keypoint_sets[ins], keypoint_sets_2[0]))
+                scores[ins] = (scores[ins]+scores_2[0])/2
+            assert width_height==width_height_2
+
+
+
+
         keypoint_sets = [{
             'coordinates': keypoints.tolist(),
             'detection_id': i,
@@ -170,10 +190,19 @@ def cli():
 
 def main():
     args = cli()
-    width_height = (int(640 * args.resolution // 16) * 16 + 1,
-                    int(480 * args.resolution // 16) * 16 + 1)
+
+    # width_height = (int(640 * args.resolution // 16) * 16 + 1,
+    #                 int(480 * args.resolution // 16) * 16 + 1)
+    width_height = (int(224 * args.resolution // 16) * 16 + 1,
+                    int(224 * args.resolution // 16) * 16 + 1)
     logging.debug('target width and height = %s', width_height)
+
+
     processor_singleton = Processor(width_height, args)
+
+    args.checkpoint = '/home/mahdi/HVR/git_repos/openpifpaf/outputs/shufflenetv2k16w-200815-173928-cif-caf-edge200-o50s.pkl.epoch036'
+    processor_singleton_2 = Processor(width_height, args)
+
 
     static_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static')
 
@@ -226,6 +255,7 @@ def main():
             }),
             (r'/process', PostHandler, {
                 'processor': processor_singleton,
+                'processor_2': processor_singleton_2,
                 'demo_password': args.demo_password,
             }),
         ],
