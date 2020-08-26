@@ -53,11 +53,11 @@ class PostHandler(RequestHandler):
                 return
             resize = False
         keypoint_sets, scores, width_height = self.processor.single_image(image, resize=resize)
-        print('keypoint_sets=',keypoint_sets)
+        # print('keypoint_sets=',keypoint_sets)
 
         # handPifPaf
         keypoint_sets_2, scores_2, width_height_2 = self.processor_2.single_image(image, resize=resize)
-        print('keypoint_sets_2=',keypoint_sets_2)
+        # print('keypoint_sets_2=',keypoint_sets_2)
 
         # concatenate PifPaf and handPifPaf
         if keypoint_sets.__len__()>0:
@@ -204,7 +204,8 @@ def main():
 
     processor_singleton = Processor(width_height, args)
 
-    args.checkpoint = '/home/mahdi/HVR/git_repos/openpifpaf/outputs/shufflenetv2k16w-200815-173928-cif-caf-edge200-o50s.pkl.epoch036'
+    # args.checkpoint = '/home/mahdi/HVR/git_repos/openpifpaf/outputs/shufflenetv2k16w-200815-173928-cif-caf-edge200-o50s.pkl.epoch036'
+    args.checkpoint = '/home/mahdi/HVR/git_repos/openpifpaf/outputs/shufflenetv2k16w-200818-231450-cif-caf-caf25-edge200-o50s.pkl.epoch200'
     processor_singleton_2 = Processor(width_height, args)
 
 
