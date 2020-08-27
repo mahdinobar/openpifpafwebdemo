@@ -26,10 +26,12 @@ import numpy as np
 
 # pylint: disable=abstract-method
 class PostHandler(RequestHandler):
-    def initialize(self, processor, processor_2, *, demo_password):
+    def initialize(self, processor, processor_2, *, demo_password, switch=1, hand_score_threshold=0.3):
         self.processor = processor  # pylint: disable=attribute-defined-outside-init
         self.processor_2 = processor_2
         self.demo_password = demo_password  # pylint: disable=attribute-defined-outside-init
+        self.switch = switch
+        self.hand_score_threshold = hand_score_threshold
 
     def set_default_headers(self):
         self.set_header('Access-Control-Allow-Origin', '*')
@@ -52,26 +54,77 @@ class PostHandler(RequestHandler):
                 self.write(json.dumps({'error': 'demo in progress'}))
                 return
             resize = False
-        keypoint_sets, scores, width_height = self.processor.single_image(image, resize=resize)
-        # print('keypoint_sets=',keypoint_sets)
 
-        # handPifPaf
-        keypoint_sets_2, scores_2, width_height_2 = self.processor_2.single_image(image, resize=resize)
-        # print('keypoint_sets_2=',keypoint_sets_2)
+        if self.switch == 1:
+            keypoint_sets, scores, width_height = self.processor.single_image(image, resize=resize)
+            # handPifPaf
+            keypoint_sets_2, scores_2, width_height_2 = self.processor_2.single_image(image, resize=resize)
+            # keypoint_sets_2 = []
+            # scores_2 = []
+            # width_height_2 = []
+            # concatenate PifPaf and handPifPaf
+            if keypoint_sets.__len__()>0:
+                if keypoint_sets_2.__len__()==0:
+                    keypoint_sets_2.append(np.zeros((21,3)))
+                    scores_2.append(np.float64(0.))
+                    width_height_2 = width_height
+                elif scores_2[0]<self.hand_score_threshold:
+                    keypoint_sets_2=[np.zeros((21,3))]
+                    scores_2=[np.float64(0.)]
+                    width_height_2 = width_height
+                # assumption: only ONE hand prediction
+                for ins in range (0, keypoint_sets.__len__()):
+                    print('score_2=',scores_2)
+                    keypoint_sets[ins] = np.concatenate((keypoint_sets[ins], keypoint_sets_2[0]))
+                    scores[ins] = (scores[ins]+scores_2[0])/2
+                assert width_height==width_height_2
 
-        # concatenate PifPaf and handPifPaf
-        if keypoint_sets.__len__()>0:
-            if keypoint_sets_2.__len__()==0:
-                keypoint_sets_2.append(np.zeros((21,3)))
+            elif keypoint_sets_2.__len__()>0 and scores_2[0]>self.hand_score_threshold:
+                if keypoint_sets.__len__()==0:
+                    keypoint_sets.append(np.zeros((17,3)))
+                    scores.append(np.float64(0.))
+                    width_height = width_height_2
+                # assumption: only ONE hand prediction
+                for ins in range (0, keypoint_sets.__len__()):
+                    keypoint_sets[ins] = np.concatenate((keypoint_sets[ins], keypoint_sets_2[0]))
+                    scores[ins] = (scores[ins]+scores_2[0])/2
+                assert width_height==width_height_2
+
+        elif self.switch == 2:
+            # PifPaf
+            keypoint_sets = []
+            scores = []
+            width_height = []
+            # handPifPaf
+            keypoint_sets_2, scores_2, width_height_2 = self.processor_2.single_image(image, resize=resize)
+            # concatenate PifPaf and handPifPaf
+            if keypoint_sets_2.__len__() > 0 and scores_2[0]>self.hand_score_threshold:
+                keypoint_sets.append(np.zeros((17, 3)))
+                scores.append(np.float64(0.))
+                width_height = width_height_2
+                # assumption: only ONE hand prediction
+                for ins in range(0, keypoint_sets.__len__()):
+                    keypoint_sets[ins] = np.concatenate((keypoint_sets[ins], keypoint_sets_2[0]))
+                    scores[ins] = (scores[ins] + scores_2[0]) / 2
+                assert width_height == width_height_2
+
+        elif self.switch == 3:
+            # PifPaf
+            keypoint_sets, scores, width_height = self.processor.single_image(image, resize=resize)
+            # handPifPaf
+            keypoint_sets_2 = []
+            scores_2 = []
+            width_height_2 = []
+            # concatenate PifPaf and handPifPaf
+            if keypoint_sets.__len__() > 0:
+                keypoint_sets_2.append(np.zeros((21, 3)))
                 scores_2.append(np.float64(0.))
                 width_height_2 = width_height
-            # assumption: only ONE hand prediction
-            for ins in range (0, keypoint_sets.__len__()):
-                keypoint_sets[ins] = np.concatenate((keypoint_sets[ins], keypoint_sets_2[0]))
-                scores[ins] = (scores[ins]+scores_2[0])/2
-            assert width_height==width_height_2
-
-
+                # assumption: only ONE hand prediction
+                for ins in range(0, keypoint_sets.__len__()):
+                    keypoint_sets[ins] = np.concatenate((keypoint_sets[ins], keypoint_sets_2[0]))
+                    scores[ins] = (scores[ins] + scores_2[0]) / 2
+                assert width_height == width_height_2
 
 
         keypoint_sets = [{
@@ -170,6 +223,13 @@ def cli():
                           default=int(os.environ.get('SSLPORT', 0)),
                           help='SSL port for webserver')
 
+    parser.add_argument('--model-switch', dest='switch',
+                        type=int, default=1,
+                        help='switch between models: 1-handPifPaf and PifPaf, 2-handPifPaf, 3-PifPaf')
+    parser.add_argument('--hand-score-thresh', dest='hand_score_threshold',
+                        type=float, default=0.3,
+                        help='threshold score for the detected hand via handPifPaf')
+
     args = parser.parse_args()
 
     # log
@@ -262,6 +322,8 @@ def main():
                 'processor': processor_singleton,
                 'processor_2': processor_singleton_2,
                 'demo_password': args.demo_password,
+                'switch': args.switch,
+                'hand_score_threshold': args.hand_score_threshold,
             }),
         ],
         debug=args.debug,
